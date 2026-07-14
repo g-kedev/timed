@@ -149,6 +149,7 @@ module("Acceptance | analysis edit", function (hooks) {
         "Please select yourself as 'reviewer' to verify reports. Please review selected reports before verifying.",
       );
   });
+
   test("cannot verify report and move it at the same time", async function (assert) {
     // we set the name of the task to something that faker will not produce
     // otherwise this is flaky as tasks with the same name could exist (and we select them in the dropdown by name)
