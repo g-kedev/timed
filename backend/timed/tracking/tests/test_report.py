@@ -2308,6 +2308,7 @@ def test_report_split(
     expected,
     expected_error_string,
     database_error,
+    mailoutbox,
 ):
     reviewer = user_factory() if verified else None
 
@@ -2334,6 +2335,8 @@ def test_report_split(
                 "updated_original_report": {
                     "comment": updated_comment,
                     "duration": updated_duration,
+                    "not_billable": True,
+                    "review": False,
                     "task": {
                         "type": "tasks",
                         "id": updated_report_task.pk,
@@ -2342,11 +2345,14 @@ def test_report_split(
                 "second_report": {
                     "comment": new_comment,
                     "duration": new_duration,
+                    "not_billable": False,
+                    "review": True,
                     "task": {
                         "type": "tasks",
                         "id": new_report_task.pk,
                     },
                 },
+                "comment": "review comment",
             },
         }
     }
@@ -2366,6 +2372,8 @@ def test_report_split(
         report.refresh_from_db()
         assert report.comment == updated_comment
         assert report.duration == updated_duration
+        assert report.not_billable
+        assert not report.review
         assert report.task == updated_report_task
         assert Report.objects.count() == original_report_count + 1
         assert (
@@ -2374,6 +2382,7 @@ def test_report_split(
             ).count()
             == 1
         )
+        assert len(mailoutbox) == 1
 
     else:
         assert report.comment == original_comment
